@@ -80,7 +80,7 @@ int main(void)
 
 	// MVP for triangle
 	// Projection matrix: 45° Field of View, 4:3 ratio, display range: 0.1 unit <-> 100 units
-	glm::mat4 Projection = perspective(radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
+	glm::mat4 Projection = perspective(radians(90.0f), (float)width / (float)height, 0.1f, 6.0f);
 
 	// Camera matrix
 	glm::mat4 View = glm::lookAt(
