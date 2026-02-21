@@ -92,12 +92,12 @@ int main(void)
 
 	// Model matrix: an identity matrix (model will be at the origin)
 	mat4 Model = mat4(1.0f);
-	//Translate triangle right 5 units
-	Model = translate(Model, vec3(5.0f, 0.0f, 0.0f));
-	// Rotate triangle 90 degrees around Z axis
-	Model = rotate(Model, radians(90.0f), vec3(0.0f, 0.0f, 1.0f));
 	// Scale triangle to double size
 	Model = scale(Model, vec3(2.0f, 2.0f, 2.0f));
+	// Rotate triangle 90 degrees around Z axis
+	Model = rotate(Model, radians(90.0f), vec3(0.0f, 0.0f, 1.0f));
+	//Translate triangle right 5 units
+	Model = translate(Model, vec3(5.0f, 0.0f, 0.0f));
 	// Our ModelViewProjection: multiplication of our 3 matrices
 	mat4 mvp = Projection * View * Model; // Remember, matrix multiplication is the other way around
 
