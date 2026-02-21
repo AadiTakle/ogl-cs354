@@ -80,20 +80,26 @@ int main(void)
 
 	// MVP for triangle
 	// Projection matrix: 45° Field of View, 4:3 ratio, display range: 0.1 unit <-> 100 units
-	//glm::mat4 Projection = perspective(radians(90.0f), (float)width / (float)height, 0.1f, 6.0f);
-	glm::mat4 Projection = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f);
+	//mat4 Projection = perspective(radians(90.0f), (float)width / (float)height, 0.1f, 6.0f);
+	mat4 Projection = ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f);
 
 	// Camera matrix
-	glm::mat4 View = glm::lookAt(
-		glm::vec3(4, 3, 3), // Camera is at (4,3,3), in World Space
-		glm::vec3(0, 0, 0), // and looks at the origin
-		glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
+	mat4 View = lookAt(
+		vec3(4, 3, 3), // Camera is at (4,3,3), in World Space
+		vec3(0, 0, 0), // and looks at the origin
+		vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
 	);
 
 	// Model matrix: an identity matrix (model will be at the origin)
-	glm::mat4 Model = glm::mat4(1.0f);
+	mat4 Model = mat4(1.0f);
+	//Translate triangle right 5 units
+	Model = translate(Model, vec3(5.0f, 0.0f, 0.0f));
+	// Rotate triangle 90 degrees around Z axis
+	Model = rotate(Model, radians(90.0f), vec3(0.0f, 0.0f, 1.0f));
+	// Scale triangle to double size
+	Model = scale(Model, vec3(2.0f, 2.0f, 2.0f));
 	// Our ModelViewProjection: multiplication of our 3 matrices
-	glm::mat4 mvp = Projection * View * Model; // Remember, matrix multiplication is the other way around
+	mat4 mvp = Projection * View * Model; // Remember, matrix multiplication is the other way around
 
 	// Make MVP uniform in shader
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
