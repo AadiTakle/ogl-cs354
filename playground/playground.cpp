@@ -16,6 +16,7 @@ GLFWwindow* window;
 using namespace glm;
 
 #include <common/shader.hpp>
+#include <common/controls.hpp>
 
 int main(void)
 {
@@ -157,33 +158,6 @@ int main(void)
 	glBindBuffer(GL_ARRAY_BUFFER, trianglecolorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_triangle_color_buffer_data), g_triangle_color_buffer_data, GL_STATIC_DRAW);
 
-	// MVP for triangle
-	// Projection matrix: 45° Field of View, 4:3 ratio, display range: 0.1 unit <-> 100 units
-	glm::mat4 Projection = perspective(radians(90.0f), (float)width / (float)height, 0.1f, 100.0f);
-
-	// Camera matrix
-	glm::mat4 View = glm::lookAt(
-		glm::vec3(4, 3, 3), // Camera is at (4,3,3), in World Space
-		glm::vec3(0, 0, 0), // and looks at the origin
-		glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
-	);
-
-	// Model matrix: an identity matrix (model will be at the origin)
-	glm::mat4 CubeModel = glm::mat4(1.0f);
-	// Our ModelViewProjection: multiplication of our 3 matrices
-	glm::mat4 cubeMVP = Projection * View * CubeModel; // Remember, matrix multiplication is the other way around
-
-	// Model matrix: an identity matrix (model will be at the origin)
-	mat4 TriangleModel = mat4(1.0f);
-	//Translate triangle right 5 units
-	TriangleModel = translate(TriangleModel, vec3(4.0f, 0.0f, -1.0f));
-	// Rotate triangle 90 degrees around Z axis
-	// TriangleModel = rotate(TriangleModel, radians(90.0f), vec3(0.0f, 0.0f, 1.0f));
-	// Scale triangle to double size
-	//TriangleModel = scale(TriangleModel, vec3(2.0f, 2.0f, 2.0f));
-	// Our ModelViewProjection: multiplication of our 3 matrices
-	mat4 triangleMVP = Projection * View * TriangleModel; // Remember, matrix multiplication is the other way around
-
 	// Make MVP uniform in shader
 	GLuint CubeMatrixID = glGetUniformLocation(cubeProgramID, "MVP");
 	GLuint TriangleMatrixID = glGetUniformLocation(triangleProgramID, "MVP");
@@ -195,6 +169,28 @@ int main(void)
 
 		// Use our shader
 		glUseProgram(cubeProgramID);
+
+		// Compute the MVP matrix from keyboard and mouse input
+		computeMatricesFromInputs();
+		glm::mat4 ProjectionMatrix = getProjectionMatrix();
+		glm::mat4 ViewMatrix = getViewMatrix();
+		glm::mat4 ModelMatrix = glm::mat4(1.0);
+		glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+
+		// Model matrix: an identity matrix (model will be at the origin)
+		glm::mat4 CubeModel = glm::mat4(1.0f);
+		// Our ModelViewProjection: multiplication of our 3 matrices
+		glm::mat4 cubeMVP = ProjectionMatrix * ViewMatrix * CubeModel; // Remember, matrix multiplication is the other way around
+		// Model matrix: an identity matrix (model will be at the origin)
+		mat4 TriangleModel = mat4(1.0f);
+		//Translate triangle right 5 units
+		TriangleModel = translate(TriangleModel, vec3(4.0f, 0.0f, -1.0f));
+		// Rotate triangle 90 degrees around Z axis
+		// TriangleModel = rotate(TriangleModel, radians(90.0f), vec3(0.0f, 0.0f, 1.0f));
+		// Scale triangle to double size
+		//TriangleModel = scale(TriangleModel, vec3(2.0f, 2.0f, 2.0f));
+		// Our ModelViewProjection: multiplication of our 3 matrices
+		mat4 triangleMVP = ProjectionMatrix * ViewMatrix * TriangleModel; // Remember, matrix multiplication is the other way around
 
 		// Give our MVP to shader uniform
 		glUniformMatrix4fv(CubeMatrixID, 1, GL_FALSE, &cubeMVP[0][0]);
