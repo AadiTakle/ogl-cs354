@@ -45,6 +45,10 @@ int main(void)
 	}
 	glfwMakeContextCurrent(window);
 
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // hides and captures cursor
+	glfwPollEvents(); // ensure internal state is updated
+	glfwSetCursorPos(window, width / 2, height / 2); // seed cursor at center
+
 	// Initialize GLEW
 	glewExperimental = true; // Needed for core profile
 	if (glewInit() != GLEW_OK) {
@@ -59,6 +63,14 @@ int main(void)
 
 	// Dark blue background
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+
+	// Enable depth test
+	glEnable(GL_DEPTH_TEST);
+	// Accept fragment if it is closer to the camera than the former one
+	glDepthFunc(GL_LESS);
+
+	// Cull triangles which normal is not towards the camera
+	glEnable(GL_CULL_FACE);
 
 	GLuint CubeVertexArrayID;
 	glGenVertexArrays(1, &CubeVertexArrayID);
@@ -165,10 +177,13 @@ int main(void)
 	do {
 
 		// Clear the screen
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Use our shader
 		glUseProgram(cubeProgramID);
+
+		// process OS events first so cursor position is up-to-date
+		glfwPollEvents();
 
 		// Compute the MVP matrix from keyboard and mouse input
 		computeMatricesFromInputs();
