@@ -79,7 +79,7 @@ int main(void)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
 	// MVP for triangle
-	// Projection matrix: 45° Field of View, 4:3 ratio, display range: 0.1 unit <-> 100 units
+	// Projection matrix: 45ï¿½ Field of View, 4:3 ratio, display range: 0.1 unit <-> 100 units
 	//mat4 Projection = perspective(radians(90.0f), (float)width / (float)height, 0.1f, 6.0f);
 	mat4 Projection = ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f);
 
@@ -92,12 +92,12 @@ int main(void)
 
 	// Model matrix: an identity matrix (model will be at the origin)
 	mat4 Model = mat4(1.0f);
-	// Scale triangle to double size
-	Model = scale(Model, vec3(2.0f, 2.0f, 2.0f));
-	// Rotate triangle 90 degrees around Z axis
-	Model = rotate(Model, radians(90.0f), vec3(0.0f, 0.0f, 1.0f));
 	//Translate triangle right 5 units
 	Model = translate(Model, vec3(5.0f, 0.0f, 0.0f));
+	// Rotate triangle 90 degrees around Z axis
+	Model = rotate(Model, radians(90.0f), vec3(0.0f, 0.0f, 1.0f));
+	// Scale triangle to double size
+	Model = scale(Model, vec3(2.0f, 2.0f, 2.0f));
 	// Our ModelViewProjection: multiplication of our 3 matrices
 	mat4 mvp = Projection * View * Model; // Remember, matrix multiplication is the other way around
 
