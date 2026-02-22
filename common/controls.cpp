@@ -32,6 +32,10 @@ float initialFoV = 45.0f;
 float speed = 3.0f; // 3 units / second
 float mouseSpeed = 0.005f;
 
+// Rotation Constants
+float radius = 5.0f;
+float time = 0.0f;
+
 
 
 void computeMatricesFromInputs(){
@@ -102,6 +106,69 @@ void computeMatricesFromInputs(){
 								position+direction, // and looks here : at the same position, plus "direction"
 								up                  // Head is up (set to 0,-1,0 to look upside-down)
 						   );
+
+	// For the next frame, the "last time" will be "now"
+	lastTime = currentTime;
+}
+
+void computeMatricsFromObjectRotation(vec3 objectCenter) {
+	// glfwGetTime is called only once, the first time this function is called
+	static double lastTime = glfwGetTime();
+
+	// Compute time difference between current and last frame
+	double currentTime = glfwGetTime();
+	float deltaTime = float(currentTime - lastTime);
+
+	position = objectCenter + vec3(
+		cos(time) * radius,
+		0.0f,
+		sin(time) * radius
+	);
+
+	vec3 direction = normalize(objectCenter - position);
+
+	// Define rotation axis (Y axis)
+	const vec3 rotationAxis = vec3(0.0f, 1.0f, 0.0f);
+	vec3 right = glm::cross(direction, rotationAxis);
+	float rlen = glm::length(right);
+	if (rlen < 1e-6f) {
+		right = vec3(1.0f, 0.0f, 0.0f);
+	}
+	else {
+		right /= rlen;
+	}
+
+	vec3 up = glm::cross(right, direction);
+
+	float FoV = initialFoV;
+
+	// Increase radius
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		radius += deltaTime * speed;
+	}
+	// Decrease radius
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		radius -= deltaTime * speed;
+		if (radius < 0.0f)
+			radius = 0.0f;
+	}
+	// Rotate around object center
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		time += deltaTime * speed;
+	}
+	// Reverse Rotation
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		time -= deltaTime * speed;
+	}
+
+	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+	ProjectionMatrix = glm::perspective(glm::radians(FoV), 4.0f / 3.0f, 0.1f, 100.0f);
+	// Camera matrix
+	ViewMatrix = glm::lookAt(
+		position,           // Camera is here
+		position + direction, // and looks here : at the same position, plus "direction"
+		up                  // Head is up (set to 0,-1,0 to look upside-down)
+	);
 
 	// For the next frame, the "last time" will be "now"
 	lastTime = currentTime;

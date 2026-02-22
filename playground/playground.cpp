@@ -11,6 +11,7 @@
 GLFWwindow* window;
 
 // Include GLM
+#define GLM_SWIZZLE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
@@ -186,14 +187,14 @@ int main(void)
 		glfwPollEvents();
 
 		// Compute the MVP matrix from keyboard and mouse input
-		computeMatricesFromInputs();
+		glm::mat4 CubeModel = glm::mat4(1.0f);
+		// Cube is centered at model origin, so object center is (0, 0, 0) in model space, convert to world space with model matrix
+		glm::vec4 objectCenter = CubeModel * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+		computeMatricsFromObjectRotation(objectCenter.xyz);
 		glm::mat4 ProjectionMatrix = getProjectionMatrix();
 		glm::mat4 ViewMatrix = getViewMatrix();
-		glm::mat4 ModelMatrix = glm::mat4(1.0);
-		glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
 		// Model matrix: an identity matrix (model will be at the origin)
-		glm::mat4 CubeModel = glm::mat4(1.0f);
 		// Our ModelViewProjection: multiplication of our 3 matrices
 		glm::mat4 cubeMVP = ProjectionMatrix * ViewMatrix * CubeModel; // Remember, matrix multiplication is the other way around
 		// Model matrix: an identity matrix (model will be at the origin)
